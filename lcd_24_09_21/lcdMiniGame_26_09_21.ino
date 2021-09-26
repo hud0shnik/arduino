@@ -6,23 +6,34 @@ void setup() {
   lcd.begin(16, 2);// размер дисплея
   lcd.setBacklight(255); //яркость
   lcd.clear();
-  lcd.print(" =^)");
+  lcd.print(" :^)");
   lcd.setCursor(2, 1);// переход на 2ую строчку
-  lcd.print("-_-");
+  lcd.print("Hello!");
   pinMode(8, INPUT_PULLUP);
-  pinMode(7, OUTPUT);
 }
+
 bool flag = false;
 bool flag2 = false;
 int nn = 0;
+int u = 0;
+
 void loop() {
   bool btnState = !digitalRead(8);
   if (btnState && !flag) {  // обработчик нажатия
     flag = true;
-    flag2 = !flag2;
     lcd.clear();
-    lcd.print(nn);
+    lcd.setCursor(nn, u);
+    lcd.print("0");
     nn++;
+    if (nn == 16){
+      nn = 0;
+      flag2 = !flag2;
+    }
+    if (flag2){
+      u = 1;
+    }else{
+      u = 0;
+    }
   }
   if (!btnState && flag) {  // обработчик отпускания
     flag = false;
