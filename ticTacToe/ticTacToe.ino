@@ -19,7 +19,7 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 int i=0;
 
 int botChoice;
-char m[9] = {'O', 'X', 'X', 'X', 'X', 'X', 'X', 'O', 'X'};
+char m[9] = {'O', ' ', ' ', ' ', ' ', ' ', ' ', 'O', 'X'};
 
 void printMap() {
  lcd.fillScreen(BLACK);
@@ -46,6 +46,7 @@ void printMap() {
  lcd.print(m[7]);
  lcd.print("|");
  lcd.println(m[8]);
+ color();
 }
 
 bool btn1 = false;
@@ -98,14 +99,16 @@ void setup(){
   lcd.println("SETUP...");
   lcd.setTextColor(BLACK,WHITE);
   printMap();
-    color();
 }
 
 void loop(){  
   bool btnState = !digitalRead(3);
   if (btnState && !btn1) {
     btn1 = true;
-    printMap();
+  if (m[userChoice]==' '){
+    m[userChoice]='X';
+  }
+  printMap();
     
   }
   if (!btnState && btn1) {
@@ -119,9 +122,7 @@ void loop(){
   }else{
     userChoice++;
   }
-  //m[userChoice]='X';
     printMap();
-    color();
     
   }
   if (!btnState2 && btn2) {
