@@ -22,6 +22,8 @@ int botChoice;
 char m[9] = {'O', ' ', 'X', ' ', ' ', ' ', ' ', 'O', ' '};
 
 void setup(){
+  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
   lcd.init(SCR_WD, SCR_HT);
   lcd.fillScreen(BLACK);
   lcd.drawRect(0,0,240,240,BLUE);
@@ -55,7 +57,33 @@ void printMap() {
  lcd.println(m[8]);
 }
 
-void loop(){
- printMap();
-  delay(1000);
+bool btn1 = false;
+bool btn2 = false;
+int userChoice = 0;
+
+void loop(){  
+  bool btnState = !digitalRead(3);
+  if (btnState && !btn1) {
+    btn1 = true;
+    printMap();
+    
+  }
+  if (!btnState && btn1) {
+    btn1 = false;
+  }
+  bool btnState2 = !digitalRead(4);
+  if (btnState2 && !btn2) {
+    btn2 = true;
+  if (userChoice >= 8){
+    userChoice = 0;
+  }else{
+    userChoice++;
+  }
+  m[userChoice]='*';
+    printMap();
+    
+  }
+  if (!btnState2 && btn2) {
+    btn2 = false;
+  }
 }
