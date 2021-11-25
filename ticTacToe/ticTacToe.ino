@@ -35,9 +35,9 @@ void setup(){
 }
 
 void printMap() {
-  lcd.fillScreen(BLACK);
-  lcd.setTextColor(WHITE);
-  lcd.setCursor(0,0);
+ lcd.fillScreen(BLACK);
+ lcd.setTextColor(WHITE);
+ lcd.setCursor(0,0);
  lcd.print(m[0]);
  lcd.print("|");
  lcd.print(m[1]);
@@ -61,6 +61,16 @@ bool btn1 = false;
 bool btn2 = false;
 int userChoice = 0;
 
+void color(){
+    switch (userChoice)
+  {
+  case 0:
+  lcd.drawRect(0,0,50,70,BLUE);
+    break;
+ 
+  }
+}
+
 void loop(){  
   bool btnState = !digitalRead(3);
   if (btnState && !btn1) {
@@ -79,8 +89,9 @@ void loop(){
   }else{
     userChoice++;
   }
-  m[userChoice]='*';
+  m[userChoice]='X';
     printMap();
+    color();
     
   }
   if (!btnState2 && btn2) {
