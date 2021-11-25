@@ -19,21 +19,7 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 int i=0;
 
 int botChoice;
-char m[9] = {'O', ' ', 'X', ' ', 'X', 'X', ' ', 'O', ' '};
-
-void setup(){
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
-  lcd.init(SCR_WD, SCR_HT);
-  lcd.fillScreen(BLACK);
-  lcd.drawRect(0,0,240,240,BLUE);
-  lcd.setTextColor(WHITE);
-  lcd.setTextSize(6);
-  lcd.setCursor(24,110);
-  lcd.println("SETUP...");
-  lcd.setTextColor(BLACK,WHITE);
-  printMap();
-}
+char m[9] = {'O', 'X', 'X', 'X', 'X', 'X', 'X', 'O', 'X'};
 
 void printMap() {
  lcd.fillScreen(BLACK);
@@ -70,10 +56,49 @@ void color(){
     switch (userChoice)
   {
   case 0:
-  lcd.drawRect(0,0,50,70,BLUE);
+  lcd.drawRect(15,0,50,60,BLUE);
+    break;
+  case 1:
+  lcd.drawRect(80,0, 60,60,BLUE);
+    break;
+  case 2:
+  lcd.drawRect(160,0, 50,60,BLUE);
+    break;
+  case 3:
+  lcd.drawRect(15,80,50,60,BLUE);
+    break;
+  case 4:
+  lcd.drawRect(80,80, 60,60,BLUE);
+    break;
+  case 5:
+  lcd.drawRect(160,80, 50,60,BLUE);
+    break;
+  case 6:
+  lcd.drawRect(15,160,50,60,BLUE);
+    break;
+  case 7:
+  lcd.drawRect(80,160, 60,60,BLUE);
+    break;
+  case 8:
+  lcd.drawRect(160,160, 50,60,BLUE);
     break;
  
   }
+}
+
+void setup(){
+  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  lcd.init(SCR_WD, SCR_HT);
+  lcd.fillScreen(BLACK);
+  lcd.drawRect(0,0,240,240,BLUE);
+  lcd.setTextColor(WHITE);
+  lcd.setTextSize(6);
+  lcd.setCursor(24,110);
+  lcd.println("SETUP...");
+  lcd.setTextColor(BLACK,WHITE);
+  printMap();
+    color();
 }
 
 void loop(){  
@@ -94,8 +119,9 @@ void loop(){
   }else{
     userChoice++;
   }
-  m[userChoice]='X';
+  //m[userChoice]='X';
     printMap();
+    color();
     
   }
   if (!btnState2 && btn2) {
