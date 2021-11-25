@@ -19,7 +19,7 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 int i=0;
 
 int botChoice;
-char m[9] = {'O', ' ', 'X', ' ', ' ', ' ', ' ', 'O', ' '};
+char m[9] = {'O', ' ', 'X', ' ', 'X', 'X', ' ', 'O', ' '};
 
 void setup(){
   pinMode(3, INPUT_PULLUP);
@@ -32,24 +32,29 @@ void setup(){
   lcd.setCursor(24,110);
   lcd.println("SETUP...");
   lcd.setTextColor(BLACK,WHITE);
+  printMap();
 }
 
 void printMap() {
  lcd.fillScreen(BLACK);
  lcd.setTextColor(WHITE);
- lcd.setCursor(0,0);
+ lcd.setCursor(24,10);
  lcd.print(m[0]);
  lcd.print("|");
  lcd.print(m[1]);
  lcd.print("|");
  lcd.println(m[2]);
+ lcd.setCursor(24,50);
  lcd.println("-+-+-");
+ lcd.setCursor(24,90);
  lcd.print(m[3]);
  lcd.print("|");
  lcd.print(m[4]);
  lcd.print("|");
  lcd.println(m[5]);
+ lcd.setCursor(24,130);
  lcd.println("-+-+-");
+ lcd.setCursor(24,170);
  lcd.print(m[6]);
  lcd.print("|");
  lcd.print(m[7]);
@@ -91,7 +96,6 @@ void loop(){
   }
   m[userChoice]='X';
     printMap();
-    color();
     
   }
   if (!btnState2 && btn2) {
