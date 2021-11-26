@@ -105,22 +105,23 @@ void setup() {
       userTurn();
       if (checkWin('O')) {
         lcd.drawRect(0, 0, 240, 240, GREEN);
+        printMsg("You win!!!");
         break;
       }
-      lcd.setTextSize(2);
-      lcd.setCursor(0, 220);
-      lcd.println("Thinking...");
-      lcd.setTextSize(6);
+      printMsg("Thinking...");
       ab(true);
       m[botChoice] = 'X';
       printMap();
       if (checkWin('X')) {
         printMap();
         lcd.drawRect(0, 0, 240, 240, RED);
+        lcd.drawRect(1, 1, 239, 239, RED);
+        printMsg("You lose...");
         break;
       }
       if (isFull()) {
         lcd.drawRect(0, 0, 240, 240, BLUE);
+        printMsg("Draw!");
         break;
       }
     }
@@ -130,8 +131,15 @@ void setup() {
     }
   }
 
-
 }
+
+void printMsg(String s){
+      lcd.setTextSize(2);
+      lcd.setCursor(0, 220);
+      lcd.println(s);
+      lcd.setTextSize(6);
+}
+
 
 void userTurn() {
   while (true) {
