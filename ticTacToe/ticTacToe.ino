@@ -1,4 +1,5 @@
 #include <SPI.h>
+
 #include <Arduino_ST7789_Fast.h>
 
 #define TFT_DC 7
@@ -8,17 +9,27 @@
 Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 
 /*  Проводочки:
- #01 GND -> GND
- #02 VCC -> VCC 
- #03 SCK -> D13
- #04 SDA -> D11/MOSI
- #05 RES -> D8 
- #06 DC  -> D7 
- #07 BLK -> NOT USED
+  #01 GND -> GND
+  #02 VCC -> VCC
+  #03 SCK -> D13
+  #04 SDA -> D11/MOSI
+  #05 RES -> D8
+  #06 DC  -> D7
+  #07 BLK -> NOT USED
 */
 
 int botChoice;
-char m[9] = {'O', ' ', ' ', ' ', ' ', ' ', ' ', 'O', 'X'};
+char m[9] = {
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' ',
+  ' '
+};
 
 void printMap() {
   lcd.fillScreen(BLACK);
@@ -51,36 +62,37 @@ void printMap() {
 bool btn1 = false;
 bool btn2 = false;
 int userChoice = 0;
+//int botChoice;
 
 void color() {
   switch (userChoice) {
-  case 0:
-    lcd.drawRect(15, 0, 50, 60, BLUE);
-    break;
-  case 1:
-    lcd.drawRect(80, 0, 60, 60, BLUE);
-    break;
-  case 2:
-    lcd.drawRect(160, 0, 50, 60, BLUE);
-    break;
-  case 3:
-    lcd.drawRect(15, 80, 50, 60, BLUE);
-    break;
-  case 4:
-    lcd.drawRect(80, 80, 60, 60, BLUE);
-    break;
-  case 5:
-    lcd.drawRect(160, 80, 50, 60, BLUE);
-    break;
-  case 6:
-    lcd.drawRect(15, 160, 50, 60, BLUE);
-    break;
-  case 7:
-    lcd.drawRect(80, 160, 60, 60, BLUE);
-    break;
-  case 8:
-    lcd.drawRect(160, 160, 50, 60, BLUE);
-    break;
+    case 0:
+      lcd.drawRect(15, 0, 50, 60, BLUE);
+      break;
+    case 1:
+      lcd.drawRect(80, 0, 60, 60, BLUE);
+      break;
+    case 2:
+      lcd.drawRect(160, 0, 50, 60, BLUE);
+      break;
+    case 3:
+      lcd.drawRect(15, 80, 50, 60, BLUE);
+      break;
+    case 4:
+      lcd.drawRect(80, 80, 60, 60, BLUE);
+      break;
+    case 5:
+      lcd.drawRect(160, 80, 50, 60, BLUE);
+      break;
+    case 6:
+      lcd.drawRect(15, 160, 50, 60, BLUE);
+      break;
+    case 7:
+      lcd.drawRect(80, 160, 60, 60, BLUE);
+      break;
+    case 8:
+      lcd.drawRect(160, 160, 50, 60, BLUE);
+      break;
 
   }
 }
@@ -96,36 +108,71 @@ void setup() {
   lcd.setCursor(24, 110);
   lcd.println("SETUP...");
   lcd.setTextColor(BLACK, WHITE);
-  printMap();
+
+  while (true) {
+    printMap();
+    while (!isFull()) {
+      userTurn();
+      if (checkWin('O')) {
+        lcd.drawRect(0, 0, 240, 240, GREEN);
+        break;
+      }
+      ab(true);
+      m[botChoice] = 'X';
+      printMap();
+      if (checkWin('X')) {
+        printMap();
+        lcd.drawRect(0, 0, 240, 240, RED);
+        break;
+      }
+      if (isFull()) {
+        lcd.drawRect(0, 0, 240, 240, BLUE);
+        break;
+      }
+    }
+    delay(3000);
+    for (int i = 0; i < 9; i++) {
+      m[i] = ' ';
+    }
+  }
+
+
+}
+
+void userTurn() {
+  while (true) {
+    bool btnState = !digitalRead(3);
+    if (btnState && !btn1) {
+      btn1 = true;
+      if (m[userChoice] == ' ') {
+        m[userChoice] = 'O';
+        printMap();
+        break;
+      }
+      printMap();
+    }
+    if (!btnState && btn1) {
+      btn1 = false;
+    }
+    bool btnState2 = !digitalRead(4);
+    if (btnState2 && !btn2) {
+      btn2 = true;
+      if (userChoice >= 8) {
+        userChoice = 0;
+      } else {
+        userChoice++;
+      }
+      printMap();
+
+    }
+    if (!btnState2 && btn2) {
+      btn2 = false;
+    }
+  }
 }
 
 void loop() {
-  bool btnState = !digitalRead(3);
-  if (btnState && !btn1) {
-    btn1 = true;
-    if (m[userChoice] == ' ') {
-      m[userChoice] = 'X';
-    }
-    printMap();
 
-  }
-  if (!btnState && btn1) {
-    btn1 = false;
-  }
-  bool btnState2 = !digitalRead(4);
-  if (btnState2 && !btn2) {
-    btn2 = true;
-    if (userChoice >= 8) {
-      userChoice = 0;
-    } else {
-      userChoice++;
-    }
-    printMap();
-
-  }
-  if (!btnState2 && btn2) {
-    btn2 = false;
-  }
 }
 
 bool checkWin(char c) {
@@ -165,9 +212,7 @@ bool isFull() {
   return true;
 }
 
-
-int ab(bool flag) // The ab function
-{
+int ab(bool flag) {
   int max = -20, min = 20;
   int i, j, value = 1;
   if (checkWin('X')) {
@@ -180,7 +225,17 @@ int ab(bool flag) // The ab function
     return 0;
   }
 
-  int score[9] = { 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  int score[9] = {
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+  };
 
   for (i = 0; i < 9; i++) {
     if (m[i] == ' ') {
@@ -188,8 +243,7 @@ int ab(bool flag) // The ab function
         if (flag == true) {
           m[i] = 'X';
           value = ab(false);
-        }
-        else {
+        } else {
           m[i] = 'O';
           value = ab(true);
         }
