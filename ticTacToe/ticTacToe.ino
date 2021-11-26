@@ -95,15 +95,16 @@ void setup() {
   lcd.drawRect(0, 0, 240, 240, BLUE);
   lcd.setTextColor(WHITE);
   lcd.setTextSize(6);
-  lcd.setCursor(24, 110);
+  lcd.setCursor(24, 100);
   lcd.println("SETUP");
   lcd.setTextColor(BLACK, WHITE);
-
-  while (true) {
+  
+  while (!true) {
     printMap();
     while (!isFull()) {
       userTurn();
       if (checkWin('O')) {
+        lcd.drawRect(1, 1, 238, 238, GREEN);
         lcd.drawRect(0, 0, 240, 240, GREEN);
         printMsg("You win!!!");
         break;
@@ -114,13 +115,14 @@ void setup() {
       printMap();
       if (checkWin('X')) {
         printMap();
+        lcd.drawRect(1, 1, 238, 238, RED);
         lcd.drawRect(0, 0, 240, 240, RED);
-        lcd.drawRect(1, 1, 239, 239, RED);
         printMsg("You lose...");
         break;
       }
       if (isFull()) {
-        lcd.drawRect(0, 0, 240, 240, BLUE);
+        lcd.drawRect(1, 1, 238, 238, RED);
+        lcd.drawRect(0, 0, 240, 240, GREEN);
         printMsg("Draw!");
         break;
       }
@@ -135,7 +137,7 @@ void setup() {
 
 void printMsg(String s){
       lcd.setTextSize(2);
-      lcd.setCursor(0, 220);
+      lcd.setCursor(5, 220);
       lcd.println(s);
       lcd.setTextSize(6);
 }
