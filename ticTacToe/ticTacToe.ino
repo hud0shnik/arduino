@@ -19,7 +19,7 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 */
 
 int botChoice;
-char m[9] = {' ',' ',' ',' ',' ',' ',' ',' ',' '};
+char m[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
 
 void printMap() {
   lcd.fillScreen(BLACK);
@@ -57,13 +57,13 @@ int userChoice = 0;
 void color() {
   switch (userChoice) {
     case 0:
-      lcd.drawRect(15, 0, 50, 60, BLUE);
+      lcd.drawRect(15, 3, 50, 60, BLUE);
       break;
     case 1:
-      lcd.drawRect(80, 0, 60, 60, BLUE);
+      lcd.drawRect(80, 3, 60, 60, BLUE);
       break;
     case 2:
-      lcd.drawRect(160, 0, 50, 60, BLUE);
+      lcd.drawRect(160, 3, 50, 60, BLUE);
       break;
     case 3:
       lcd.drawRect(15, 80, 50, 60, BLUE);
@@ -98,8 +98,8 @@ void setup() {
   lcd.setCursor(24, 100);
   lcd.println("SETUP");
   lcd.setTextColor(BLACK, WHITE);
-  
-  while (!true) {
+
+  while (true) {
     printMap();
     while (!isFull()) {
       userTurn();
@@ -135,11 +135,11 @@ void setup() {
 
 }
 
-void printMsg(String s){
-      lcd.setTextSize(2);
-      lcd.setCursor(5, 220);
-      lcd.println(s);
-      lcd.setTextSize(6);
+void printMsg(String s) {
+  lcd.setTextSize(2);
+  lcd.setCursor(5, 220);
+  lcd.println(s);
+  lcd.setTextSize(6);
 }
 
 
@@ -229,7 +229,7 @@ int ab(bool flag) {
     return 0;
   }
 
-  int score[9] = {1,1,1,1,1,1,1,1,1};
+  int score[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
 
   for (i = 0; i < 9; i++) {
     if (m[i] == ' ') {
