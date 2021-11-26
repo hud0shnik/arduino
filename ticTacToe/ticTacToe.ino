@@ -117,6 +117,10 @@ void setup() {
         lcd.drawRect(0, 0, 240, 240, GREEN);
         break;
       }
+      lcd.setTextSize(2);
+      lcd.setCursor(0, 220);
+      lcd.println("Thinking...");
+      lcd.setTextSize(6);
       ab(true);
       m[botChoice] = 'X';
       printMap();
