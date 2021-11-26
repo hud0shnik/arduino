@@ -20,128 +20,9 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 
 int botChoice;
 char m[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-
-void printMap() {
-  lcd.fillScreen(BLACK);
-  lcd.setTextColor(WHITE);
-  lcd.setCursor(24, 10);
-  lcd.print(m[0]);
-  lcd.print("|");
-  lcd.print(m[1]);
-  lcd.print("|");
-  lcd.println(m[2]);
-  lcd.setCursor(24, 50);
-  lcd.println("-+-+-");
-  lcd.setCursor(24, 90);
-  lcd.print(m[3]);
-  lcd.print("|");
-  lcd.print(m[4]);
-  lcd.print("|");
-  lcd.println(m[5]);
-  lcd.setCursor(24, 130);
-  lcd.println("-+-+-");
-  lcd.setCursor(24, 170);
-  lcd.print(m[6]);
-  lcd.print("|");
-  lcd.print(m[7]);
-  lcd.print("|");
-  lcd.println(m[8]);
-  color();
-}
-
 bool btn1 = false;
 bool btn2 = false;
 int userChoice = 0;
-//int botChoice;
-
-void color() {
-  switch (userChoice) {
-    case 0:
-      lcd.drawRect(15, 3, 50, 60, BLUE);
-      break;
-    case 1:
-      lcd.drawRect(80, 3, 60, 60, BLUE);
-      break;
-    case 2:
-      lcd.drawRect(160, 3, 50, 60, BLUE);
-      break;
-    case 3:
-      lcd.drawRect(15, 80, 50, 60, BLUE);
-      break;
-    case 4:
-      lcd.drawRect(80, 80, 60, 60, BLUE);
-      break;
-    case 5:
-      lcd.drawRect(160, 80, 50, 60, BLUE);
-      break;
-    case 6:
-      lcd.drawRect(15, 160, 50, 60, BLUE);
-      break;
-    case 7:
-      lcd.drawRect(80, 160, 60, 60, BLUE);
-      break;
-    case 8:
-      lcd.drawRect(160, 160, 50, 60, BLUE);
-      break;
-
-  }
-}
-
-void setup() {
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
-  lcd.init(SCR_WD, SCR_HT);
-  lcd.fillScreen(BLACK);
-  lcd.drawRect(0, 0, 240, 240, BLUE);
-  lcd.setTextColor(WHITE);
-  lcd.setTextSize(6);
-  lcd.setCursor(24, 100);
-  lcd.println("SETUP");
-  lcd.setTextColor(BLACK, WHITE);
-
-  while (true) {
-    printMap();
-    while (!isFull()) {
-      userTurn();
-      if (checkWin('O')) {
-        lcd.drawRect(1, 1, 238, 238, GREEN);
-        lcd.drawRect(0, 0, 240, 240, GREEN);
-        printMsg("You win!!!");
-        break;
-      }
-      printMsg("Thinking...");
-      ab(true);
-      m[botChoice] = 'X';
-      printMap();
-      if (checkWin('X')) {
-        printMap();
-        lcd.drawRect(1, 1, 238, 238, RED);
-        lcd.drawRect(0, 0, 240, 240, RED);
-        printMsg("You lose...");
-        break;
-      }
-      if (isFull()) {
-        lcd.drawRect(1, 1, 238, 238, RED);
-        lcd.drawRect(0, 0, 240, 240, GREEN);
-        printMsg("Draw!");
-        break;
-      }
-    }
-    delay(3000);
-    for (int i = 0; i < 9; i++) {
-      m[i] = ' ';
-    }
-  }
-
-}
-
-void printMsg(String s) {
-  lcd.setTextSize(2);
-  lcd.setCursor(5, 220);
-  lcd.println(s);
-  lcd.setTextSize(6);
-}
-
 
 void userTurn() {
   while (true) {
@@ -175,9 +56,6 @@ void userTurn() {
   }
 }
 
-void loop() {
-
-}
 
 bool checkWin(char c) {
   if ((m[0] == m[1]) && (c == m[0]) && (m[2] == c)) {
@@ -267,4 +145,123 @@ int ab(bool flag) {
     }
     return min;
   }
+}
+
+void color() {
+  switch (userChoice) {
+    case 0:
+      lcd.drawRect(10, 5, 60, 60, BLUE);
+      break;
+    case 1:
+      lcd.drawRect(80, 5, 60, 60, BLUE);
+      break;
+    case 2:
+      lcd.drawRect(152, 5, 60, 60, BLUE);
+      break;
+    case 3:
+      lcd.drawRect(10, 80, 60, 60, BLUE);
+      break;
+    case 4:
+      lcd.drawRect(80, 80, 60, 60, BLUE);
+      break;
+    case 5:
+      lcd.drawRect(152, 80, 60, 60, BLUE);
+      break;
+    case 6:
+      lcd.drawRect(10, 160, 60, 60, BLUE);
+      break;
+    case 7:
+      lcd.drawRect(80, 160, 60, 60, BLUE);
+      break;
+    case 8:
+      lcd.drawRect(152, 160, 60, 60, BLUE);
+      break;
+  }
+}
+
+void printMap() {
+  lcd.fillScreen(BLACK);
+  lcd.setTextColor(WHITE);
+  lcd.setCursor(24, 10);
+  lcd.print(m[0]);
+  lcd.print("|");
+  lcd.print(m[1]);
+  lcd.print("|");
+  lcd.println(m[2]);
+  lcd.setCursor(24, 50);
+  lcd.println("-+-+-");
+  lcd.setCursor(24, 90);
+  lcd.print(m[3]);
+  lcd.print("|");
+  lcd.print(m[4]);
+  lcd.print("|");
+  lcd.println(m[5]);
+  lcd.setCursor(24, 130);
+  lcd.println("-+-+-");
+  lcd.setCursor(24, 172);
+  lcd.print(m[6]);
+  lcd.print("|");
+  lcd.print(m[7]);
+  lcd.print("|");
+  lcd.println(m[8]);
+  color();
+}
+
+void printMsg(String s) {
+  lcd.setTextSize(2);
+  lcd.setCursor(5, 220);
+  lcd.println(s);
+  lcd.setTextSize(6);
+}
+
+void loop() {
+
+}
+
+void setup() {
+  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  lcd.init(SCR_WD, SCR_HT);
+  lcd.fillScreen(BLACK);
+  lcd.drawRect(0, 0, 240, 240, BLUE);
+  lcd.setTextColor(WHITE);
+  lcd.setTextSize(6);
+  lcd.setCursor(24, 100);
+  lcd.println("SETUP");
+  lcd.setTextColor(BLACK, WHITE);
+
+  while (true) {
+    printMap();
+    while (!isFull()) {
+      userTurn();
+      if (checkWin('O')) {
+        lcd.drawRect(1, 1, 238, 238, GREEN);
+        lcd.drawRect(0, 0, 240, 240, GREEN);
+        printMsg("You win!!!");
+        break;
+      }
+      printMsg("Thinking...");
+      ab(true);
+      m[botChoice] = 'X';
+      printMap();
+      if (checkWin('X')) {
+        printMap();
+        lcd.drawRect(1, 1, 238, 238, RED);
+        lcd.drawRect(0, 0, 240, 240, RED);
+        printMsg("You lose...");
+        break;
+      }
+      if (isFull()) {
+        lcd.drawRect(1, 1, 238, 238, RED);
+        lcd.drawRect(0, 0, 240, 240, GREEN);
+        printMsg("Draw!");
+        break;
+      }
+    }
+    delay(3000);
+    for (int i = 0; i < 9; i++) {
+      m[i] = ' ';
+    }
+  }
+
 }
