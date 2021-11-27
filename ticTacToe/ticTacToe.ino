@@ -1,5 +1,4 @@
 #include <SPI.h>
-
 #include <Arduino_ST7789_Fast.h>
 
 #define TFT_DC 7
@@ -8,14 +7,15 @@
 #define SCR_HT 240
 Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 
-/*  Проводочки:
+/*  
+  Проводочки:
   #01 GND -> GND
   #02 VCC -> VCC
   #03 SCK -> D13
-  #04 SDA -> D11/MOSI
+  #04 SDA -> D11
   #05 RES -> D8
   #06 DC  -> D7
-  #07 BLK -> NOT USED
+  #07 BLK -> Не знаю зачем эта штука, лучше её не трогать
 */
 
 int botChoice;
@@ -95,6 +95,7 @@ bool isFull() {
 }
 
 int ab(bool flag) {
+  //логика робота
   int max = -20, min = 20;
   int i, j, value = 1;
   if (checkWin('X')) {
@@ -148,6 +149,7 @@ int ab(bool flag) {
 }
 
 void color() {
+  //Синяя обводка для выбора клетки для хода
   switch (userChoice) {
     case 0:
       lcd.drawRect(10, 5, 60, 60, BLUE);
@@ -180,6 +182,7 @@ void color() {
 }
 
 void printMap() {
+  // Вывод поля на дисплей, значения курсора ставил на глаз
   lcd.fillScreen(BLACK);
   lcd.setTextColor(WHITE);
   lcd.setCursor(24, 10);
@@ -208,14 +211,17 @@ void printMap() {
 }
 
 void printMsg(String s) {
+  //Отдельная функция для вывода строки в левом нижнем углу
   lcd.setTextSize(2);
   lcd.setCursor(5, 220);
   lcd.println(s);
+  //Возвращаем размер шрифта, так как у
+  //поля и этого сообщения они разные
   lcd.setTextSize(6);
 }
 
 void loop() {
-
+  //loop сделал пустым, так как всё происходит в setup'e
 }
 
 void setup() {
@@ -229,9 +235,10 @@ void setup() {
   lcd.setCursor(24, 100);
   lcd.println("SETUP");
   lcd.setTextColor(BLACK, WHITE);
-
+  // Цикл игры
   while (true) {
     printMap();
+    //Цикл партии
     while (!isFull()) {
       userTurn();
       if (checkWin('O')) {
@@ -258,10 +265,11 @@ void setup() {
         break;
       }
     }
+    //Маленькая пауза для осмысления своего проигрыша
     delay(3000);
+    //И обнуление игрового поля
     for (int i = 0; i < 9; i++) {
       m[i] = ' ';
     }
   }
-
 }
