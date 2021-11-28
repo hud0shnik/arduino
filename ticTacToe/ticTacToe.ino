@@ -3,6 +3,7 @@
 
 #define TFT_DC 7
 #define TFT_RST 8
+//Размеры дисплея
 #define SCR_WD 240
 #define SCR_HT 240
 Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
@@ -221,7 +222,7 @@ void printMsg(String s) {
 }
 
 void loop() {
-  //loop сделал пустым, так как всё происходит в setup'e
+  //loop пустой, так как всё происходит в setup'e
 }
 
 void setup() {
@@ -229,11 +230,11 @@ void setup() {
   pinMode(4, INPUT_PULLUP);
   lcd.init(SCR_WD, SCR_HT);
   lcd.fillScreen(BLACK);
-  lcd.drawRect(0, 0, 240, 240, BLUE);
+  //lcd.drawRect(0, 0, 240, 240, BLUE);
   lcd.setTextColor(WHITE);
   lcd.setTextSize(6);
-  lcd.setCursor(24, 100);
-  lcd.println("SETUP");
+  //lcd.setCursor(24, 100);
+  //lcd.println("SETUP");
   lcd.setTextColor(BLACK, WHITE);
   // Цикл игры
   while (true) {
@@ -265,7 +266,7 @@ void setup() {
         break;
       }
     }
-    //Маленькая пауза для осмысления своего проигрыша
+    //Маленькая пауза для осмысления проигрыша
     delay(3000);
     //И обнуление игрового поля
     for (int i = 0; i < 9; i++) {
