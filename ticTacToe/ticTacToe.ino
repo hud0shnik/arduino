@@ -3,6 +3,7 @@
 
 #define TFT_DC 7
 #define TFT_RST 8
+
 //Размеры дисплея
 #define SCR_WD 240
 #define SCR_HT 240
@@ -19,15 +20,14 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
   #07 BLK -> Не знаю зачем эта штука, лучше её не трогать
 */
 
-int botChoice;
 char m[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
-bool btn1 = false;
-bool btn2 = false;
-int userChoice = 0;
+bool btn1 = false, btn2 = false;
+int botChoice, userChoice = 0;
 
 void userTurn() {
+  bool btnState,btnState2;
   while (true) {
-    bool btnState = !digitalRead(3);
+    btnState = !digitalRead(3);
     if (btnState && !btn1) {
       btn1 = true;
       if (m[userChoice] == ' ') {
@@ -40,7 +40,7 @@ void userTurn() {
     if (!btnState && btn1) {
       btn1 = false;
     }
-    bool btnState2 = !digitalRead(4);
+    btnState2 = !digitalRead(4);
     if (btnState2 && !btn2) {
       btn2 = true;
       if (userChoice >= 8) {
@@ -96,8 +96,8 @@ bool isFull() {
 }
 
 int ab(bool flag) {
-  //логика робота
-  int max = -20, min = 20;
+  //логика бота
+  int max = -2000, min = 2000;
   int i, j, value = 1;
   if (checkWin('X')) {
     return 10;
@@ -217,7 +217,7 @@ void printMsg(String s) {
   lcd.setCursor(5, 220);
   lcd.println(s);
   //Возвращаем размер шрифта, так как у
-  //поля и этого сообщения они разные
+  //игрового поля и этого сообщения они разные
   lcd.setTextSize(6);
 }
 
