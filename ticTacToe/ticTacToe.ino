@@ -184,7 +184,6 @@ void color() {
 void printMap() {
   // Вывод поля на дисплей, значения курсора ставил на глаз
   lcd.fillScreen(BLACK);
-  lcd.setTextColor(WHITE);
   lcd.setCursor(24, 10);
   lcd.print(m[0]);
   lcd.print("|");
@@ -221,7 +220,41 @@ void printMsg(String s) {
 }
 
 void loop() {
-  //loop пустой, так как всё происходит в setup'e
+  printMap();
+  userTurn();
+  botFirstTurn();
+  while (!isFull()) {
+    userTurn();
+    if (checkWin('O')) {
+      lcd.drawRect(1, 1, 238, 238, GREEN);
+      lcd.drawRect(0, 0, 240, 240, GREEN);
+      printMsg("You win!!!");
+      break;
+    }
+    printMsg("Thinking...");
+    ab(true);
+    m[botChoice] = 'X';
+    printMap();
+    if (checkWin('X')) {
+      printMap();
+      lcd.drawRect(1, 1, 238, 238, RED);
+      lcd.drawRect(0, 0, 240, 240, RED);
+      printMsg("You lose...");
+      break;
+    }
+    if (isFull()) {
+      lcd.drawRect(1, 1, 238, 238, RED);
+      lcd.drawRect(0, 0, 240, 240, GREEN);
+      printMsg("Draw!");
+      break;
+    }
+  }
+  //Маленькая пауза для осмысления проигрыша
+  delay(3000);
+  //И обнуление игрового поля
+  for (int i = 0; i < 9; i++) {
+    m[i] = ' ';
+  }
 }
 
 void botFirstTurn() {
@@ -239,44 +272,4 @@ void setup() {
   pinMode(4, INPUT_PULLUP);
   lcd.init(SCR_WD, SCR_HT);
   lcd.setTextSize(6);
-  lcd.setTextColor(BLACK, WHITE);
-  // Цикл игры
-  while (true) {
-    //Цикл партии
-    printMap();
-    userTurn();
-    botFirstTurn();
-    while (!isFull()) {
-      userTurn();
-      if (checkWin('O')) {
-        lcd.drawRect(1, 1, 238, 238, GREEN);
-        lcd.drawRect(0, 0, 240, 240, GREEN);
-        printMsg("You win!!!");
-        break;
-      }
-      printMsg("Thinking...");
-      ab(true);
-      m[botChoice] = 'X';
-      printMap();
-      if (checkWin('X')) {
-        printMap();
-        lcd.drawRect(1, 1, 238, 238, RED);
-        lcd.drawRect(0, 0, 240, 240, RED);
-        printMsg("You lose...");
-        break;
-      }
-      if (isFull()) {
-        lcd.drawRect(1, 1, 238, 238, RED);
-        lcd.drawRect(0, 0, 240, 240, GREEN);
-        printMsg("Draw!");
-        break;
-      }
-    }
-    //Маленькая пауза для осмысления проигрыша
-    delay(3000);
-    //И обнуление игрового поля
-    for (int i = 0; i < 9; i++) {
-      m[i] = ' ';
-    }
-  }
 }
