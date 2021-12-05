@@ -2,8 +2,8 @@
 #include <Arduino_ST7789_Fast.h>
 
 //Порты, для DC и RESET
-#define TFT_DC 7
-#define TFT_RST 8
+#define TFT_DC 9
+#define TFT_RST 10
 
 //Размеры дисплея
 #define SCR_WD 240
@@ -18,8 +18,8 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
   VCC -> 5V
   SCK -> D13
   SDA -> D11
-  RES -> D8
-  DC  -> D7
+  RES -> D10
+  DC  -> D9
   BLK -> Не знаю зачем эта штука, лучше её не трогать
 */
 
