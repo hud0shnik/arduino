@@ -61,6 +61,12 @@ void userTurn() {
 }
 
 bool checkWin(char c) {
+  if ((m[0] == m[4]) && (c == m[0]) && (m[8] == c)) {
+    return true;
+  }
+  if ((m[6] == m[4]) && (c == m[6]) && (m[2] == c)) {
+    return true;
+  }
   if ((m[0] == m[1]) && (c == m[0]) && (m[2] == c)) {
     return true;
   }
@@ -77,12 +83,6 @@ bool checkWin(char c) {
     return true;
   }
   if ((m[2] == m[5]) && (c == m[2]) && (m[8] == c)) {
-    return true;
-  }
-  if ((m[0] == m[4]) && (c == m[0]) && (m[8] == c)) {
-    return true;
-  }
-  if ((m[6] == m[4]) && (c == m[6]) && (m[2] == c)) {
     return true;
   }
   return false;
