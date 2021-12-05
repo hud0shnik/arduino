@@ -243,12 +243,12 @@ void loop() {
   printMap();
   userTurn();
   botFirstTurn();
-  while (!isFull()) {
+  while (true) {
     userTurn();
     if (checkWin('O')) {
       lcd.drawRect(1, 1, 238, 238, GREEN);
       lcd.drawRect(0, 0, 240, 240, GREEN);
-      printMsg("You win!!!");
+      printMsg("You win!Impossible!!!");
       break;
     }
     printMsg("Thinking...");
