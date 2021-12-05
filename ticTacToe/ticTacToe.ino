@@ -238,8 +238,6 @@ void setup() {
   pinMode(3, INPUT_PULLUP);
   pinMode(4, INPUT_PULLUP);
   lcd.init(SCR_WD, SCR_HT);
-  lcd.fillScreen(BLACK);
-  lcd.setTextColor(WHITE);
   lcd.setTextSize(6);
   lcd.setTextColor(BLACK, WHITE);
   // Цикл игры
