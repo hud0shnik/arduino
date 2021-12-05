@@ -9,7 +9,7 @@
 #define SCR_HT 240
 Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 
-/*  
+/*
   Проводочки:
   #01 GND -> GND
   #02 VCC -> VCC
@@ -25,7 +25,7 @@ bool btn1 = false, btn2 = false;
 int botChoice, userChoice = 0;
 
 void userTurn() {
-  bool btnState,btnState2;
+  bool btnState, btnState2;
   while (true) {
     btnState = !digitalRead(3);
     if (btnState && !btn1) {
@@ -56,7 +56,6 @@ void userTurn() {
     }
   }
 }
-
 
 bool checkWin(char c) {
   if ((m[0] == m[1]) && (c == m[0]) && (m[2] == c)) {
@@ -225,21 +224,30 @@ void loop() {
   //loop пустой, так как всё происходит в setup'e
 }
 
+void botFirstTurn() {
+  if (m[4] == ' ') {
+    m[4] = 'X';
+  }
+  else {
+    m[8] = 'X';
+  }
+  printMap();
+}
+
 void setup() {
   pinMode(3, INPUT_PULLUP);
   pinMode(4, INPUT_PULLUP);
   lcd.init(SCR_WD, SCR_HT);
   lcd.fillScreen(BLACK);
-  //lcd.drawRect(0, 0, 240, 240, BLUE);
   lcd.setTextColor(WHITE);
   lcd.setTextSize(6);
-  //lcd.setCursor(24, 100);
-  //lcd.println("SETUP");
   lcd.setTextColor(BLACK, WHITE);
   // Цикл игры
   while (true) {
-    printMap();
     //Цикл партии
+    printMap();
+    userTurn();
+    botFirstTurn();
     while (!isFull()) {
       userTurn();
       if (checkWin('O')) {
