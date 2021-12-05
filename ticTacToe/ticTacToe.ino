@@ -1,23 +1,26 @@
 #include <SPI.h>
 #include <Arduino_ST7789_Fast.h>
 
+//Порты, для DC и RESET
 #define TFT_DC 7
 #define TFT_RST 8
 
 //Размеры дисплея
 #define SCR_WD 240
 #define SCR_HT 240
+
+//Сам дисплей
 Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
 
 /*
   Проводочки:
-  #01 GND -> GND
-  #02 VCC -> VCC
-  #03 SCK -> D13
-  #04 SDA -> D11
-  #05 RES -> D8
-  #06 DC  -> D7
-  #07 BLK -> Не знаю зачем эта штука, лучше её не трогать
+  GND -> GND
+  VCC -> 5V
+  SCK -> D13
+  SDA -> D11
+  RES -> D8
+  DC  -> D7
+  BLK -> Не знаю зачем эта штука, лучше её не трогать
 */
 
 char m[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
@@ -219,6 +222,23 @@ void printMsg(String s) {
   lcd.setTextSize(6);
 }
 
+void botFirstTurn() {
+  if (m[4] == ' ') {
+    m[4] = 'X';
+  }
+  else {
+    m[8] = 'X';
+  }
+  printMap();
+}
+
+void setup() {
+  pinMode(3, INPUT_PULLUP);
+  pinMode(4, INPUT_PULLUP);
+  lcd.init(SCR_WD, SCR_HT);
+  lcd.setTextSize(6);
+}
+
 void loop() {
   printMap();
   userTurn();
@@ -255,21 +275,4 @@ void loop() {
   for (int i = 0; i < 9; i++) {
     m[i] = ' ';
   }
-}
-
-void botFirstTurn() {
-  if (m[4] == ' ') {
-    m[4] = 'X';
-  }
-  else {
-    m[8] = 'X';
-  }
-  printMap();
-}
-
-void setup() {
-  pinMode(3, INPUT_PULLUP);
-  pinMode(4, INPUT_PULLUP);
-  lcd.init(SCR_WD, SCR_HT);
-  lcd.setTextSize(6);
 }
