@@ -1,4 +1,5 @@
 #include <SPI.h>
+
 #include <Arduino_ST7789_Fast.h>
 
 //Порты, для DC и RESET
@@ -22,6 +23,7 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
   DC  -> D9
   BLK -> Не знаю зачем эта штука, лучше её не трогать
 */
+
 
 char m[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
 bool btn1 = false, btn2 = false;
@@ -154,33 +156,33 @@ int ab(bool flag) {
 void color() {
   //Синяя обводка для выбора клетки для хода
   switch (userChoice) {
-    case 0:
-      lcd.drawRect(10, 5, 60, 60, BLUE);
-      break;
-    case 1:
-      lcd.drawRect(80, 5, 60, 60, BLUE);
-      break;
-    case 2:
-      lcd.drawRect(152, 5, 60, 60, BLUE);
-      break;
-    case 3:
-      lcd.drawRect(10, 80, 60, 60, BLUE);
-      break;
-    case 4:
-      lcd.drawRect(80, 80, 60, 60, BLUE);
-      break;
-    case 5:
-      lcd.drawRect(152, 80, 60, 60, BLUE);
-      break;
-    case 6:
-      lcd.drawRect(10, 160, 60, 60, BLUE);
-      break;
-    case 7:
-      lcd.drawRect(80, 160, 60, 60, BLUE);
-      break;
-    case 8:
-      lcd.drawRect(152, 160, 60, 60, BLUE);
-      break;
+  case 0:
+    lcd.drawRect(10, 5, 60, 60, BLUE);
+    break;
+  case 1:
+    lcd.drawRect(80, 5, 60, 60, BLUE);
+    break;
+  case 2:
+    lcd.drawRect(152, 5, 60, 60, BLUE);
+    break;
+  case 3:
+    lcd.drawRect(10, 80, 60, 60, BLUE);
+    break;
+  case 4:
+    lcd.drawRect(80, 80, 60, 60, BLUE);
+    break;
+  case 5:
+    lcd.drawRect(152, 80, 60, 60, BLUE);
+    break;
+  case 6:
+    lcd.drawRect(10, 160, 60, 60, BLUE);
+    break;
+  case 7:
+    lcd.drawRect(80, 160, 60, 60, BLUE);
+    break;
+  case 8:
+    lcd.drawRect(152, 160, 60, 60, BLUE);
+    break;
   }
 }
 
@@ -225,8 +227,7 @@ void printMsg(String s) {
 void botFirstTurn() {
   if (m[4] == ' ') {
     m[4] = 'X';
-  }
-  else {
+  } else {
     m[8] = 'X';
   }
   printMap();
