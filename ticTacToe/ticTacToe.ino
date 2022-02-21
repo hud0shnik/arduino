@@ -21,11 +21,12 @@ Arduino_ST7789 lcd = Arduino_ST7789(TFT_DC, TFT_RST);
   SDA -> D11
   RES -> D10
   DC  -> D9
-  BLK -> Не знаю зачем эта штука, лучше её не трогать
+  BLK -> эту штуку лучше не трогать
 */
 
-
-char m[9] = {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '};
+char m[9] = {
+  ' ',  ' ',  ' ',  ' ',  ' ',  ' ',  ' ',  ' ',  ' '
+};
 bool btn1 = false, btn2 = false;
 int botChoice, userChoice = 0;
 
@@ -113,7 +114,9 @@ int ab(bool flag) {
     return 0;
   }
 
-  int score[9] = {1, 1, 1, 1, 1, 1, 1, 1, 1};
+  int score[9] = {
+    1,    1,    1,    1,    1,    1,    1,    1,    1
+  };
 
   for (i = 0; i < 9; i++) {
     if (m[i] == ' ') {
