@@ -72,8 +72,13 @@ void loop() {
         lcd.print("Today GitHub");
         lcd.setCursor(0, 1);
         lcd.print("contributions:");
-        lcd.setCursor(14, 1);
-        lcd.print(commits);
+        if (commits < 10) {
+          lcd.setCursor(15, 1);
+          lcd.print(commits);
+        } else {
+          lcd.setCursor(14, 1);
+          lcd.print(commits);
+        }
 
       }
       else {
