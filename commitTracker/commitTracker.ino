@@ -10,7 +10,7 @@ const char* ssid = "имя_сети";
 const char* password = "пароль";
 
 // Ссылка на апиху
-String url =  "http://hud0shnikgitapi.herokuapp.com/commits/hud0shnik";
+String url =  "https://githubstatsapi.vercel.app/api/commits?id=hud0shnik";
 
 // Порт дисплея и его размеры
 LiquidCrystal_I2C lcd(0x27, 16, 2);
