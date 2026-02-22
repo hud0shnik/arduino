@@ -13,6 +13,8 @@
 #define TFT_RST  5   // RES → D1 (GPIO5)
 #define BTN_PIN  12  // D6 (GPIO12) — кнопка: один вывод на D6, второй на GND
 #define BUZZER_PIN 4 // D2 (GPIO4) — HW-508 (3 ноги): VCC→3.3V, GND→GND, I/O→D2
+#define BUZZER_DUTY_PERCENT 80  // громкость зуммера (duty cycle, 1–100%)
+#define LED_POWER_PIN 16  // D0 (GPIO16) — дискретный сигнал питания светодиодов: HIGH пока на экране ASCII-арт
 // Встроенный светодиод у RST на D4 (GPIO2). DC дисплея перенесён на D3 — этот пин держим HIGH, светодиод не горит.
 #define BOARD_LED_PIN 2
 const int timerCycleMin = 45;     // длительность таймера в минутах
@@ -48,12 +50,13 @@ void setup() {
 
   // Инициализация 240x240; для многих GMT130 нужен именно SPI_MODE2
   tft.init(240, 240, SPI_MODE2);
-  SPI.setFrequency(40000000);  // 40 МГц — быстрее отрисовка, меньше «рваного» обновления
   tft.setRotation(2);  // 180° — картинка не вверх ногами
   u8g2_for_adafruit_gfx.begin(tft);  // подключить шрифты U8g2 к дисплею
 
   pinMode(BTN_PIN, INPUT_PULLUP);  // кнопка: нажатие = LOW
   pinMode(BUZZER_PIN, OUTPUT);
+  pinMode(LED_POWER_PIN, OUTPUT);
+  digitalWrite(LED_POWER_PIN, LOW);  // светодиоды выключены до показа ASCII-арта
 
   drawStartScreen();
 }
@@ -93,22 +96,20 @@ void drawStartScreen() {
 }
 
 void runTimer() {
+  digitalWrite(LED_POWER_PIN, LOW);  // выключить светодиоды при переходе к таймеру
   tft.fillScreen(color_one);
   tft.setTextColor(color_four);
   tft.setTextSize(5);
 
-  // Один раз вычисляем прямоугольник под максимальную строку — обновляем только его
+  // Прямоугольник под таймер: считаем по самой широкой строке "Xm 59s", чтобы при 10m→9m ничего не съезжало
   char maxBuf[16];
-  snprintf(maxBuf, sizeof(maxBuf), "%dm %ds", timerCycleMin, 0);
+  snprintf(maxBuf, sizeof(maxBuf), "%dm 59s", timerCycleMin);
   int16_t mx, my;
   uint16_t mw, mh;
   tft.getTextBounds(maxBuf, 0, 0, &mx, &my, &mw, &mh);
-  int timerX = (240 - mw) / 2 + mx;
-  int timerY = (240 - mh) / 2 + my;
-  // Запас по краям, чтобы не было артефактов
-  int pad = 4;
-  int rx = timerX - pad;
-  int ry = timerY - pad;
+  int pad = 6;
+  int rx = (240 - mw) / 2 - mx - pad;
+  int ry = (240 - mh) / 2 - my - pad;
   int rw = mw + pad * 2;
   int rh = mh + pad * 2;
   if (rx < 0) { rw += rx; rx = 0; }
@@ -116,25 +117,52 @@ void runTimer() {
   if (rx + rw > 240) rw = 240 - rx;
   if (ry + rh > 240) rh = 240 - ry;
 
+  // Ширина блока секунд под "59s" — одна и та же зона под секунды, без хвостов при 10s→9s
+  char secMaxBuf[8];
+  snprintf(secMaxBuf, sizeof(secMaxBuf), "59s");
+  int16_t sx0, sy0;
+  uint16_t secMaxW, secMaxH;
+  tft.getTextBounds(secMaxBuf, 0, 0, &sx0, &sy0, &secMaxW, &secMaxH);
+
   int totalSec = timerCycleMin * 60;
   int sec = totalSec;
+  int lastMinutes = -1;       // минуты в прошлом кадре — перерисовываем их только при смене
+  int lastMinutesWidth = 0;   // ширина строки "Xm " в пикселях (для позиции секунд)
+  int lastTimerX = 0, lastTimerY = 0;  // позиция последней полной отрисовки
+  char minBuf[8];
 
   while (sec >= 1) {
     int minutes = sec / 60;
     int seconds = sec % 60;
 
-    char countdownBuf[16];
-    snprintf(countdownBuf, sizeof(countdownBuf), "%dm %ds", minutes, seconds);
-    int16_t bx, by;
-    uint16_t bw, bh;
-    tft.getTextBounds(countdownBuf, 0, 0, &bx, &by, &bw, &bh);
-
-    // Всё обновление в одной SPI-транзакции — экран не рвёт между fillRect и текстом
-    tft.startWrite();
-    tft.fillRect(rx, ry, rw, rh, color_one);
-    tft.setCursor((240 - bw) / 2, (240 - bh) / 2);
-    tft.print(countdownBuf);
-    tft.endWrite();
+    if (minutes != lastMinutes) {
+      // Минуты изменились — перерисовываем весь таймер (центр строки не съезжает: учитываем bx, by)
+      tft.fillRect(rx, ry, rw, rh, color_one);
+      char countdownBuf[16];
+      snprintf(countdownBuf, sizeof(countdownBuf), "%dm %ds", minutes, seconds);
+      int16_t bx, by;
+      uint16_t bw, bh;
+      tft.getTextBounds(countdownBuf, 0, 0, &bx, &by, &bw, &bh);
+      lastTimerX = (240 - bw) / 2 - bx;
+      lastTimerY = (240 - bh) / 2 - by;
+      tft.setCursor(lastTimerX, lastTimerY);
+      tft.print(countdownBuf);
+      lastMinutes = minutes;
+      snprintf(minBuf, sizeof(minBuf), "%dm ", minutes);
+      tft.getTextBounds(minBuf, 0, 0, &bx, &by, &bw, &bh);
+      lastMinutesWidth = bw;
+    } else {
+      // Минуты те же — обновляем только блок секунд (всегда очищаем зону под "59s", без хвостов)
+      char secBuf[8];
+      snprintf(secBuf, sizeof(secBuf), "%ds", seconds);
+      int secX = lastTimerX + lastMinutesWidth;
+      if (secX < rx) secX = rx;
+      int secW = secMaxW + 6;
+      if (secX + secW > rx + rw) secW = rx + rw - secX;
+      tft.fillRect(secX, ry, secW, rh, color_one);
+      tft.setCursor(secX, lastTimerY);
+      tft.print(secBuf);
+    }
 
     // Секунда: проверка кнопки — сброс таймера
     unsigned long until = millis() + 1000;
@@ -154,18 +182,18 @@ void runTimer() {
   }
 
   tft.fillScreen(color_one);
+  digitalWrite(LED_POWER_PIN, HIGH);  // питание светодиодов: включено пока на экране ASCII-арт
   drawAsciiArt();  // рисунок на экране во время проигрывания мелодии
 
   //  G C~ Eb G~ Eb F#~ Eb F Eb C A# G~  
   const float freq[] = { 196.0f, 261.6f, 261.6f, 311.1f, 392.0f, 392.0f, 311.1f, 370.0f, 370.0f, 311.1f, 349.2f, 311.1f, 261.6f, 233.1f, 196.0f, 196.0f };  // G4 C4 Eb4 G4 Eb4 F#4 Eb4 F4 C4 A#3 G4 G3
   const int numNotes = 16;
   const int noteMs = 220;   // длительность ноты
-  const int dutyPercent = 1;  
 
   for (int n = 0; n < numNotes; n++) {
     float f = freq[n];
     unsigned int periodUs = (unsigned int)(1000000.0f / f);
-    unsigned int onUs = (unsigned int)(periodUs * dutyPercent / 100);
+    unsigned int onUs = (unsigned int)(periodUs * BUZZER_DUTY_PERCENT / 100);
     if (onUs < 10) onUs = 10;
     unsigned int offUs = periodUs - onUs;
     const unsigned long noteEnd = millis() + noteMs;
