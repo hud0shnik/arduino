@@ -1,23 +1,38 @@
-
-
-// ESP8266  + GMT130 ips 240*240
+// ESP32 DevKit1 (WROOM) + GMT130 IPS 240x240 (ST7789)
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
 #include <SPI.h>
 #include <U8g2_for_Adafruit_GFX.h>
 
-// Пины по схеме. На дисплее: GND, VCC, SCK, SDA, RES, DC, BLK
-// SCK → D5 (GPIO14), SDA → D7 (GPIO13) — аппаратный SPI, не меняем
-#define TFT_CS   15  // D8 (GPIO15) — на модуле нет CS, но пин нужен библиотеке (держим LOW)
-#define TFT_DC   0   // DC → D3 (GPIO0), чтобы D4 (GPIO2) не трогать — на нём встроенный светодиод
-#define TFT_RST  5   // RES → D1 (GPIO5)
-#define BTN_PIN  12  // D6 (GPIO12) — кнопка: один вывод на D6, второй на GND
-#define BUZZER_PIN 4 // D2 (GPIO4) — HW-508 (3 ноги): VCC→3.3V, GND→GND, I/O→D2
-#define BUZZER_DUTY_PERCENT 80  // громкость зуммера (duty cycle, 1–100%)
-#define LED_POWER_PIN 16  // D0 (GPIO16) — дискретный сигнал питания светодиодов: HIGH пока на экране ASCII-арт
-// Встроенный светодиод у RST на D4 (GPIO2). DC дисплея перенесён на D3 — этот пин держим HIGH, светодиод не горит.
-#define BOARD_LED_PIN 2
-const int timerCycleMin = 45;     // длительность таймера в минутах
+/* ============ ПИНЫ ДЛЯ ESP32 DevKit1 ============
+   Дисплей GMT130 (аппаратный SPI VSPI по умолчанию):
+   SCK  -> GPIO18
+   MOSI -> GPIO23
+   MISO -> не используется (можно GPIO19)
+   CS   -> GPIO5
+   DC   -> GPIO17
+   RST  -> GPIO16
+   Кнопка, зуммер, светодиоды:
+   BTN        -> GPIO4  (подтяжка INPUT_PULLUP, нажатие = LOW)
+   BUZZER     -> GPIO25 (пассивный зуммер, ШИМ‑сигнал)
+   LED_POWER  -> GPIO27 (HIGH = включены светодиоды во время ASCII‑арта)
+   BOARD_LED  -> GPIO2  (встроенный синий LED, активный HIGH)
+*/
+#define TFT_CS     5
+#define TFT_DC    17
+#define TFT_RST   16
+#define BTN_PIN    4
+#define BUZZER_PIN 22
+#define BUZZER_DUTY_PERCENT 80   // громкость зуммера (duty cycle, 1–100%)
+#define LED_POWER_PIN 21
+#define BOARD_LED_PIN  2        // встроенный светодиод DevKit1 (GPIO2, HIGH = горит)
+
+// Пины аппаратного SPI (VSPI по умолчанию)
+#define TFT_SCK  18
+#define TFT_MOSI 23
+#define TFT_MISO -1              // не используется
+
+const int timerCycleMin = 45;    // длительность таймера в минутах
 
 // Цвета начального экрана (RGB565)
 #define COL_RGB565(r, g, b) ((((r)>>3)<<11) | (((g)>>2)<<5) | ((b)>>3))
@@ -26,20 +41,19 @@ const int timerCycleMin = 45;     // длительность таймера в 
 #define color_three COL_RGB565(0x7b, 0xc6, 0x7b)  // #7bc67b
 #define color_four  COL_RGB565(0xff, 0xff, 0xb5)  // #ffffb5
 
-
-// Аппаратный SPI (важно для стабильной работы): только CS, DC, RST
+// Аппаратный SPI (CS, DC, RST заданы, SPI будет настроен в setup)
 Adafruit_ST7789 tft = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
-U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;  // шрифты U8g2 с поддержкой UTF-8/кириллицы
+U8G2_FOR_ADAFRUIT_GFX u8g2_for_adafruit_gfx;
 
 void setup() {
-  // Погасить встроенный светодиод у RST (на многих платах он на D4/GPIO2, активен по LOW)
+  // Встроенный светодиод DevKit1 — выключаем (LOW, т.к. активный HIGH)
   pinMode(BOARD_LED_PIN, OUTPUT);
-  digitalWrite(BOARD_LED_PIN, HIGH);
+  digitalWrite(BOARD_LED_PIN, LOW);
 
   Serial.begin(115200);
-  Serial.println("Инициализация дисплея GMT130...");
+  Serial.println("Инициализация дисплея GMT130 (ESP32)...");
 
-  // Сброс дисплея вручную (на всякий случай)
+  // Ручной сброс дисплея
   pinMode(TFT_RST, OUTPUT);
   digitalWrite(TFT_RST, HIGH);
   delay(20);
@@ -48,12 +62,15 @@ void setup() {
   digitalWrite(TFT_RST, HIGH);
   delay(150);
 
+  // Аппаратный SPI на пинах VSPI
+  SPI.begin(TFT_SCK, TFT_MISO, TFT_MOSI);
+
   // Инициализация 240x240; для многих GMT130 нужен именно SPI_MODE2
   tft.init(240, 240, SPI_MODE2);
   tft.setRotation(2);  // 180° — картинка не вверх ногами
-  u8g2_for_adafruit_gfx.begin(tft);  // подключить шрифты U8g2 к дисплею
+  u8g2_for_adafruit_gfx.begin(tft);  // подключить шрифты U8g2
 
-  pinMode(BTN_PIN, INPUT_PULLUP);  // кнопка: нажатие = LOW
+  pinMode(BTN_PIN, INPUT_PULLUP);    // кнопка: нажатие = LOW
   pinMode(BUZZER_PIN, OUTPUT);
   pinMode(LED_POWER_PIN, OUTPUT);
   digitalWrite(LED_POWER_PIN, LOW);  // светодиоды выключены до показа ASCII-арта
@@ -92,7 +109,7 @@ void drawStartScreen() {
 
   u8g2_for_adafruit_gfx.setCursor(x0, y0 + ascent + 6 * lineH);
   u8g2_for_adafruit_gfx.setForegroundColor(color_two);
-  u8g2_for_adafruit_gfx.print("v0.3.2-rc");
+  u8g2_for_adafruit_gfx.print("v0.4.1-rc");
 }
 
 void runTimer() {
@@ -188,7 +205,7 @@ void runTimer() {
   //  G C~ Eb G~ Eb F#~ Eb F Eb C A# G~  
   const float freq[] = { 196.0f, 261.6f, 261.6f, 311.1f, 392.0f, 392.0f, 311.1f, 370.0f, 370.0f, 311.1f, 349.2f, 311.1f, 261.6f, 233.1f, 196.0f, 196.0f };  // G4 C4 Eb4 G4 Eb4 F#4 Eb4 F4 C4 A#3 G4 G3
   const int numNotes = 16;
-  const int noteMs = 220;   // длительность ноты
+  const int noteMs = 220;
 
   for (int n = 0; n < numNotes; n++) {
     float f = freq[n];
@@ -202,13 +219,12 @@ void runTimer() {
       delayMicroseconds(onUs);
       digitalWrite(BUZZER_PIN, LOW);
       delayMicroseconds(offUs);
-      yield();  // даём ESP8266 обслужить watchdog, иначе ресет ~3.2 с
+      yield();
     }
   }
   digitalWrite(BUZZER_PIN, LOW);
 }
 
-// Отрисовка ASCII-арта: каждый не-пробел = квадрат, масштаб под весь экран 240x240
 const char* asciiArt[] = {
  " |`-.._____..-'|",
  " :  > .  ,  <  :",
@@ -231,11 +247,10 @@ const char* asciiArt[] = {
 const int asciiArtLines = 17;
 
 void drawAsciiArt() { 
-    tft.fillScreen(color_one);
+  tft.fillScreen(color_one);
 
-  // Крупный шрифт с кириллицей — картинка на весь экран (края могут обрезаться)
   u8g2_for_adafruit_gfx.setFont(u8g2_font_10x20_t_cyrillic);
-  u8g2_for_adafruit_gfx.setFontMode(1);  // прозрачный фон
+  u8g2_for_adafruit_gfx.setFontMode(1);
   u8g2_for_adafruit_gfx.setForegroundColor(color_four);
 
   int maxLen = 0;
@@ -243,13 +258,11 @@ void drawAsciiArt() {
     int n = strlen(asciiArt[i]);
     if (n > maxLen) maxLen = n;
   }
-  // Шрифт 10x20: картинка больше экрана — рисуем с (0,0), обрежется справа и снизу
+
   const int fontW = 10;
   const int fontLineH = 20;
-  int picW = maxLen * fontW;
-  int picH = asciiArtLines * fontLineH;
-  int x0 = 0;   // без обрезки слева
-  int y0 = 0;   // без обрезки сверху
+  int x0 = 0;
+  int y0 = 0;
 
   int ascent = u8g2_for_adafruit_gfx.getFontAscent();
   int descent = u8g2_for_adafruit_gfx.getFontDescent();
@@ -278,4 +291,3 @@ void loop() {
   }
   delay(20);
 }
-
